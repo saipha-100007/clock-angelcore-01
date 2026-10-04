@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Celestial Clock</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,500;0,600;1,500;1,600&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+  --bg:#fffafb;--page:#ffffff;--border:#efdde3;--accent:#d596ad;--time:#6b5560;--sec:#cfa9b8;
+  --pill:#fbe6ec;--pillb:#f2d0da;--pillt:#a8657f;--text:#8a7480;--title:#8f7782;--line:#f3e5ea;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#2a2025;--page:#1f1a1d;--border:#4a3640;--accent:#e0a3b8;--time:#ecd3dc;--sec:#a07f8c;
+  --pill:#43303a;--pillb:#5c4350;--pillt:#f0bccd;--text:#c9aeb9;--title:#c9aeb9;--line:#3d2d35;}}
+:root[data-theme="dark"]{
+  --bg:#2a2025;--page:#1f1a1d;--border:#4a3640;--accent:#e0a3b8;--time:#ecd3dc;--sec:#a07f8c;
+  --pill:#43303a;--pillb:#5c4350;--pillt:#f0bccd;--text:#c9aeb9;--title:#c9aeb9;--line:#3d2d35;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{margin:0;height:100%;background:var(--page);font-family:'Poppins',system-ui,sans-serif}
+body{display:flex;align-items:center;justify-content:center;padding:10px;box-sizing:border-box}
+.card{width:100%;max-width:340px;box-sizing:border-box;background:var(--bg);border:1.5px solid var(--border);border-radius:24px;padding:16px 18px 14px}
+.top,.bot{display:flex;align-items:center;justify-content:space-between}
+.title{color:var(--title);font-weight:500;font-size:14px;letter-spacing:1.5px;white-space:nowrap}
+.pill{border:1.5px solid var(--pillb);background:var(--pill);color:var(--pillt);font-family:inherit;font-weight:600;font-size:12px;letter-spacing:.8px;padding:2px 11px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.pill.static{cursor:default}
+.mid{text-align:center;padding:20px 0 14px}
+.time{font-family:'Playfair Display',serif;font-weight:500;font-size:40px;letter-spacing:3px;color:var(--time);line-height:1}
+.time small{font-size:12px;letter-spacing:1px;color:var(--sec);margin-left:3px}
+.time b{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;letter-spacing:.5px;color:var(--accent);margin-left:5px}
+.phrase{margin-top:10px;color:var(--accent);font-weight:500;font-style:italic;font-size:13px;letter-spacing:1px}
+.bot{border-top:1px solid var(--line);padding-top:11px}
+.date{color:var(--text);font-size:14px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <span class="title">✦ CELESTIAL ✦</span>
+    <button class="pill" id="fmt" title="Switch 12H / 24H">12H</button>
+  </div>
+  <div class="mid">
+    <div class="time"><span id="hm">12:19</span><small id="s">01</small><b id="ap">AM</b></div>
+    <div class="phrase" id="ph">✧ CELESTIAL HOUR ✧</div>
+  </div>
+  <div class="bot">
+    <span class="date" id="d"></span>
+    <span class="pill static" id="doy"></span>
+  </div>
+</div>
+<script>
+var days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+var months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+var phrases=['CELESTIAL HOUR','MIDNIGHT STILLNESS','STARLIT SILENCE','BEFORE THE DAWN','FIRST LIGHT','DAYBREAK','MORNING GLOW','GOLDEN MORNING','SOFT SUNSHINE','LATE MORNING','CLEAR SKIES','HIGH NOON','BRIGHT AFTERNOON','DRIFTING CLOUDS','LAZY AFTERNOON','LONG SHADOWS','GOLDEN HOUR','SKY ABLAZE','SUNSET','TWILIGHT','DUSK','FIRST STARS','QUIET NIGHT','MOONRISE'];
+var is12=true;
+try{var v=localStorage.getItem('clk12');if(v!==null)is12=v==='1'}catch(e){}
+var f=document.getElementById('fmt');
+f.onclick=function(){is12=!is12;try{localStorage.setItem('clk12',is12?'1':'0')}catch(e){}tick()};
+function p(n){return n<10?'0'+n:''+n}
+function tick(){
+  var n=new Date(),h=n.getHours(),hh=is12?(h%12||12):h;
+  document.getElementById('hm').textContent=(is12?hh:p(hh))+':'+p(n.getMinutes());
+  document.getElementById('s').textContent=p(n.getSeconds());
+  var ap=document.getElementById('ap');ap.style.display=is12?'':'none';ap.textContent=h<12?'AM':'PM';
+  f.textContent=is12?'12H':'24H';
+  document.getElementById('ph').textContent='✧ '+phrases[h]+' ✧';
+  document.getElementById('d').textContent=days[n.getDay()]+', '+months[n.getMonth()]+' '+n.getDate();
+  var doy=Math.floor((n-new Date(n.getFullYear(),0,0))/864e5);
+  document.getElementById('doy').textContent='DAY '+doy;
+}
+tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
